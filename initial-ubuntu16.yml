@@ -1,0 +1,56 @@
+- hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+- hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Install aptitude for Ansible
+      raw: test -e /usr/bin/aptitude || (apt -y update && apt install -y aptitude)
+
+- hosts: all
+  gather_facts: true
+
+- hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - apt: pkg={{ item }} state=absent purge=yes autoclean=yes
+      with_items:
+        - webbrowser-app
+        - gnome-calendar
+        - thunderbird 
+        - unity-lens-shopping
+    - debug: var=inventory_dir
+    - hostname: name={{ inventory_hostname }}
+    - mount: name=swap fstype=swap state=absent
+    - command: swapoff -a
+      when: ansible_swaptotal_mb > 0
+    - apt: update_cache=yes upgrade=yes autoremove=yes
+    - package: name={{ item }} state=latest
+      with_items:
+       - ntp
+       - htop
+       - iftop
+       - bmon
+       - apt-transport-https
+       - ca-certificates
+       - curl
+       - software-properties-common
+       - intel-microcode
+       - openvpn
+       - network-manager-openvpn
+       - network-manager-openvpn-gnome
+       - openjdk-8-jre 
+       - openjdk-8-jdk
+       - icedtea-netx
+    - group: name=sudo state=present
+    - group: name=wheel state=present
+    - user: name={{ ansible_user }} shell=/bin/bash groups=adm,sudo,wheel,docker append=yes
+    - lineinfile: "dest=/etc/sudoers state=present line='%sudo ALL=(ALL) NOPASSWD: ALL'"
+ 
+
