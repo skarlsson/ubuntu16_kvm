@@ -41,7 +41,7 @@
        - icedtea-netx
     - group: name=sudo state=present
     - group: name=wheel state=present
-    - user: name={{ ansible_user }} shell=/bin/bash groups=adm,sudo,wheel,docker append=yes
+    - user: name={{ ansible_user }} shell=/bin/bash groups=adm,sudo,wheel append=yes
     - lineinfile: "dest=/etc/sudoers state=present line='%sudo ALL=(ALL) NOPASSWD: ALL'"
  
 
